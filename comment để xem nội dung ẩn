@@ -1,0 +1,105 @@
+
+<div class='center'><div id="codeDisplay" style="display: none;">
+    Mã của bạn: <span id="code"></span>
+</div>
+  <div id="cmtngay">Anh em để lại nhận xét để lấy mã nhé!
+  </div>
+<div id="contentLock">
+<input type="text" id="unlockCode" maxlength="4">
+    <button class='button' onclick="checkCode()">Mở khóa</button>
+    <div id="error" class="error"></div>
+</div>
+<div id="countdown" style="display: none;">Nội dung sẽ hiển thị sau <span id="timer">5</span> giây</div></div>
+<div id="hiddenContent" style="display: none;">
+    <p>Nội dung bí mật của bạn ở đây</p>
+</div>
+
+<style>
+    .error {
+        color: red;
+    }
+  #unlockCode{
+    border-top: 0;
+    border-bottom: 0;
+    border-left: 0;
+    padding: 10px;
+    width: 70px;
+    height: 8px;
+    color: #333;
+    border-radius: 7px;
+    border-right: 0;
+    background: #dddddd;
+    font-size: 12px;
+    line-height: 16px;
+    margin-top: 5px;
+}
+</style>
+
+<script>
+let initialComments = getInitialCommentCount();
+window.onload = checkUnlockedState;
+
+function getInitialCommentCount() {
+    let commentElement = document.querySelector('.comments-count-in-post');
+    return commentElement ? parseInt(commentElement.innerText) : 0;
+}
+
+function getCurrentURL() {
+    return window.location.href;
+}
+
+function getCurrentURLLastDigits() {
+    let url = getCurrentURL();
+    let matches = url.match(/(\d{4})(?:\D*$)/);
+    return matches ? matches[1] : null;
+}
+
+function checkUnlockedState() {
+    let url = getCurrentURL();
+    if (localStorage.getItem('contentUnlocked-' + url) === 'true') {
+        document.getElementById('contentLock').style.display = 'none';
+        document.getElementById('hiddenContent').style.display = 'block';
+        return;
+    }
+
+    let currentComments = getInitialCommentCount();
+    if (currentComments > initialComments) {
+        let code = getCurrentURLLastDigits();
+        document.getElementById('code').innerText = code;
+        document.getElementById('codeDisplay').style.display = 'block';
+              document.getElementById('cmtngay').style.display = 'none';
+    }
+}
+
+function checkCode() {
+    let enteredCode = document.getElementById('unlockCode').value;
+    let urlCode = getCurrentURLLastDigits();
+    let currentComments = getInitialCommentCount();
+    let url = getCurrentURL();
+
+    if (currentComments <= initialComments) {
+        document.getElementById('error').innerText = 'Vui lòng để lại bình luận để nhận mã!';
+        return;
+    }
+
+    if (enteredCode === urlCode) {
+        document.getElementById('error').innerText = '';
+        document.getElementById('countdown').style.display = 'block';
+        let countdownTime = 5;
+        let countdownTimer = setInterval(function() {
+            document.getElementById('timer').innerText = countdownTime;
+            countdownTime--;
+            if (countdownTime < 0) {
+                clearInterval(countdownTimer);
+                document.getElementById('countdown').style.display = 'none';
+                document.getElementById('contentLock').style.display = 'none';
+                document.getElementById('codeDisplay').style.display = 'none';
+                document.getElementById('hiddenContent').style.display = 'block';
+                localStorage.setItem('contentUnlocked-' + url, 'true');
+            }
+        }, 1000);
+    } else {
+        document.getElementById('error').innerText = 'Mã không chính xác!';
+    }
+}
+</script>
