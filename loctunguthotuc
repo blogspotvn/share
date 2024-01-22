@@ -1,0 +1,79 @@
+<input type="text" id="ids" name="ids" autocomplete="off"><br><br>
+
+<input type="checkbox" id="applyToWholeSite" name="applyToWholeSite">
+<label for="applyToWholeSite">Áp dụng cho toàn website</label><br><br>
+
+<b>Danh sách từ ngữ cần lọc (phân cách bằng dấu phẩy mỗi từ)</b>
+<input type="text" id="words" name="words" autocomplete="off"><br><br>
+
+<button class="button" onclick="generateCode()">Tạo Code</button>
+<button class="button buttonclear" onclick="clearForm()">Reset</button>
+
+<pre id="output" style="display: none;"></pre>
+
+<script>
+ function generateCode() {
+    var ids = document.getElementById('ids').value.split(',').map(s => s.trim());
+    var applyToWholeSite = document.getElementById('applyToWholeSite').checked;
+    var words = document.getElementById('words').value.split(',').map(s => s.trim().replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"));
+    words.sort(function(a, b) {
+        return b.length - a.length;
+    });
+
+    var code = `/* \n`;
+    code += `Lọc từ ngữ không phù hợp cho Website \n`;
+    code += `Tool được viết bởi: A Đê Min \n`;
+    code += `Website: blogspotvn.net \n`;
+    code += `*/ \n`;
+    code += `document.addEventListener("DOMContentLoaded", function() {\n`;
+    code += `    function replaceStringInTextNodes(element) {\n`;
+    code += `        element.childNodes.forEach(function(node) {\n`;
+    code += `            if (node.nodeType === Node.TEXT_NODE) {\n`;
+    code += `                node.nodeValue = node.nodeValue.replace(/(${words.join('|')})/gi, '***');\n`;
+    code += `            } else if (node.nodeType === Node.ELEMENT_NODE) {\n`;
+    code += `                replaceStringInTextNodes(node);\n`;
+    code += `            }\n`;
+    code += `        });\n`;
+    code += `    }\n\n`;
+    if (applyToWholeSite) {
+        code += `    replaceStringInTextNodes(document.body);\n`;
+    } else {
+        code += `    var ids = ${JSON.stringify(ids)};\n`;
+        code += `    ids.forEach(function(id) {\n`;
+        code += `        var element = document.getElementById(id);\n`;
+        code += `        if (element) {\n`;
+        code += `            replaceStringInTextNodes(element);\n`;
+        code += `        }\n`;
+        code += `    });\n`;
+    }
+    code += `});`;
+
+    var outputElement = document.getElementById('output');
+    outputElement.textContent = code;
+    outputElement.style.display = 'block';
+}
+
+function clearForm() {
+    document.getElementById('ids').value = '';
+    document.getElementById('words').value = '';
+    document.getElementById('applyToWholeSite').checked = false;
+    var outputElement = document.getElementById('output');
+    outputElement.style.display = 'none';
+    outputElement.textContent = '';
+}
+</script>
+
+<style>
+.container input {
+    border: 0;
+    padding: 10px;
+    width: 90%;
+    color: #333;
+    border-radius: 7px;
+    background: #ddd;
+  }
+  .container #applyToWholeSite{width:auto}
+.buttonclear {
+    background: #ca252b;
+}
+</style>
