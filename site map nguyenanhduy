@@ -1,8 +1,7 @@
-
 var cat_home = 'https://www.nguyenanhduy.com';
 cat_numb = 20;
-cat_pre = '&lt;i class="fa fa-chevron-left"&gt;&lt;/i&gt;';
-cat_nex = '&lt;i class="fa fa-chevron-right"&gt;&lt;/i&gt;';
+cat_pre = '<i class="fa fa-chevron-left"></i>';
+cat_nex = '<i class="fa fa-chevron-right"></i>';
 var cat_name;
 var cat_start;
 var cat_class;
@@ -10,7 +9,7 @@ var oldestFirst = false;
 
 document.getElementById('toggleOrderSpan').addEventListener('click', function() {
     oldestFirst = !oldestFirst; 
-    var orderText = oldestFirst ? 'Cũ nhất &amp;#8645;' : 'Mới nhất &amp;#8645;';
+    var orderText = oldestFirst ? 'Cũ nhất &#8645;' : 'Mới nhất &#8645;';
     document.getElementById('toggleOrderSpan').innerHTML = orderText;
     updatePosts(); 
 });
@@ -23,7 +22,7 @@ function show_post(a, b, c, orderByOldestFirst) {
     var d = document.getElementsByTagName('head')[0];
     var e = document.createElement('script');
     e.type = 'text/javascript';
-    e.setAttribute('src', cat_home + '/feeds/posts/default/-/' + a + '?alt=json-in-script&amp;start-index=' + b + '&amp;max-results=' + cat_numb + '&amp;orderby=published&amp;reverse=' + orderByOldestFirst + '&amp;callback=show_post2');
+    e.setAttribute('src', cat_home + '/feeds/posts/default/-/' + a + '?alt=json-in-script&start-index=' + b + '&max-results=' + cat_numb + '&orderby=published&reverse=' + orderByOldestFirst + '&callback=show_post2');
     d.appendChild(e);
     cat_name = a;
     cat_start = parseInt(b), cat_class = c;
@@ -32,20 +31,20 @@ function show_post(a, b, c, orderByOldestFirst) {
 function show_post2(a) {
     var tt = a.feed.openSearch$totalResults.$t;
     var dw = '';
-    dw += '&lt;div class="label-name"&gt;&lt;h2&gt;&lt;i class="fa fa-tag"&gt;&lt;/i&gt; ' + cat_name + '&lt;/h2&gt;&lt;/div&gt;';
-    dw += '&lt;ul&gt;';
-    for (var i = 0; i &lt; cat_numb &amp;&amp; i &lt; a.feed.entry.length; i++) {
+    dw += '<div class="label-name"><h2><i class="fa fa-tag"></i> ' + cat_name + '</h2></div>';
+    dw += '<ul>';
+    for (var i = 0; i < cat_numb && i < a.feed.entry.length; i++) {
         var entry = a.feed.entry[i];
         cat_title = entry.title.$t;
         var cat_url = '';
-        for (var j = 0; j &lt; entry.link.length; j++) {
+        for (var j = 0; j < entry.link.length; j++) {
             if (entry.link[j].rel == 'alternate') {
                 cat_url = entry.link[j].href;
                 break; 
             }
         }
       function addZero(i) {
-  if (i &lt; 10) {i = "0" + i}
+  if (i < 10) {i = "0" + i}
   return i;
 }
         var publishedDate = new Date(entry.published.$t);
@@ -55,89 +54,79 @@ function show_post2(a) {
                             addZero(publishedDate.getHours()) + ':' + addZero(publishedDate.getMinutes());
         var numComments = entry.thr$total.$t;
         
-        dw += '&lt;li style="display:flex"&gt;';
-        dw += (cat_start + i) + '. &lt;span&gt;&lt;a target="blank" href="' + cat_url + '" rel="nofollow"&gt;' + cat_title + '&lt;/a&gt;- '+ numComments +' &lt;i class="fa fa-comments-o"&gt;&lt;/i&gt;&lt;/span&gt;';
-        dw += '&lt;span style="margin-left:auto;color:#888;white-space:nowrap"&gt;[' + formattedDate + ']&lt;/span&gt;'; 
-        dw += '&lt;/li&gt;';
+        dw += '<li style="display:flex">';
+        dw += (cat_start + i) + '. <span><a target="blank" href="' + cat_url + '" rel="nofollow">' + cat_title + '</a>- '+ numComments +' <i class="fa fa-comments-o"></i></span>';
+        dw += '<span style="margin-left:auto;color:#888;white-space:nowrap">[' + formattedDate + ']</span>'; 
+        dw += '</li>';
     }
-    dw += '&lt;/ul&gt;';
-dw += '&lt;div id="navi-cat"&gt;';
+    dw += '</ul>';
+dw += '<div id="navi-cat">';
 
-var lastPageButtonDisplayed = false; 
+    var lastPageButtonDisplayed = false; 
 
-if (cat_start &gt; 1) {
-    dw += '&lt;a href="" onclick="show_post(\'' + cat_name + '\',\'' + (cat_start - cat_numb) + '\',\'' + cat_class + '\');return false"&gt;' + cat_pre + '&lt;/a&gt;';
-}
-
-var numPagesToShow = 3; // Số lượng trang hiển thị trong một nhóm
-var currentPage = Math.ceil(cat_start / cat_numb); 
-var totalPages = Math.ceil(tt / cat_numb); 
-var startPage = Math.max(1, currentPage - Math.floor(numPagesToShow / 2)); 
-var endPage = Math.min(startPage + numPagesToShow - 1, totalPages);
-
-if (startPage &gt; 1) {
-    dw += '&lt;a href="" onclick="show_post(\'' + cat_name + '\',\'1\',\'' + cat_class + '\');return false"&gt;1&lt;/a&gt;';
-    if (startPage &gt; 2) {
-        dw += '... ';
+    if (cat_start > 1) {
+        dw += '<a href="" onclick="show_post(\'' + cat_name + '\',\'' + (cat_start - cat_numb) + '\',\'' + cat_class + '\',' + oldestFirst + ');return false">' + cat_pre + '</a>';
     }
-}
 
-for (var p = startPage; p &lt;= endPage; p++) {
-    if (p === currentPage) {
-        dw += '&lt;span class="current"&gt;' + p + '&lt;/span&gt;';
-    } else {
-        dw += '&lt;a href="" onclick="show_post(\'' + cat_name + '\',\'' + ((p - 1) * cat_numb + 1) + '\',\'' + cat_class + '\');return false"&gt;' + p + '&lt;/a&gt;';
+    var numPagesToShow = 3; // Số lượng trang hiển thị trong một nhóm
+    var currentPage = Math.ceil(cat_start / cat_numb); 
+    var totalPages = Math.ceil(tt / cat_numb); 
+    var startPage = Math.max(1, currentPage - Math.floor(numPagesToShow / 2)); 
+    var endPage = Math.min(startPage + numPagesToShow - 1, totalPages); 
+
+    if (startPage > 1) {
+        dw += '<a href="" onclick="show_post(\'' + cat_name + '\',\'1\',\'' + cat_class + '\',' + oldestFirst + ');return false">1</a>';
+        if (startPage > 2) {
+            dw += '… ';
+        }
     }
-}
 
-if (endPage &lt; totalPages &amp;&amp; totalPages &gt; numPagesToShow &amp;&amp; !lastPageButtonDisplayed) {
-    if (endPage &lt; totalPages - 1) {
-        dw += '... ';
+    for (var p = startPage; p <= endPage; p++) {
+        if (p === currentPage) {
+            dw += '<span class="current">' + p + '</span>';
+        } else {
+            dw += '<a href="" onclick="show_post(\'' + cat_name + '\',\'' + ((p - 1) * cat_numb + 1) + '\',\'' + cat_class + '\',' + oldestFirst + ');return false">' + p + '</a>';
+        }
     }
-    var lastPageStartIndex = (totalPages - 1) * cat_numb + 1;
-    dw += '&lt;a href="" onclick="show_post(\'' + cat_name + '\',\'' + lastPageStartIndex + '\',\'' + cat_class + '\');return false"&gt;' + totalPages + '&lt;/a&gt;';
-    lastPageButtonDisplayed = true; 
+
+    if (endPage < totalPages && totalPages > numPagesToShow && !lastPageButtonDisplayed) {
+        if (endPage < totalPages - 1) {
+            dw += '… ';
+        }
+        var lastPageStartIndex = (totalPages - 1) * cat_numb + 1;
+        dw += '<a href="" onclick="show_post(\'' + cat_name + '\',\'' + lastPageStartIndex + '\',\'' + cat_class + '\',' + oldestFirst + ');return false">' + totalPages + '</a>';
+        lastPageButtonDisplayed = true; 
+    }
+
+    if ((cat_start + cat_numb - 1) < tt) {
+        dw += '<a href="" onclick="show_post(\'' + cat_name + '\',\'' + (cat_start + cat_numb) + '\',\'' + cat_class + '\',' + oldestFirst + ');return false">' + cat_nex + '</a>';
+    }
+
+    dw += '<span class="right">' + cat_start + ' &ndash; ' + Math.min(cat_start + cat_numb - 1, tt) + ' / ' + tt + '</span>';
+    dw += '</div>';
+    document.getElementById('show-post').innerHTML = dw + '<style type="text/css">.cat-' + cat_class + ' a{background:#bbb!important;color:#fff!important}<\/style>';
 }
-
-if ((cat_start + cat_numb - 1) &lt; tt) {
-    dw += '&lt;a href="" onclick="show_post(\'' + cat_name + '\',\'' + (cat_start + cat_numb) + '\',\'' + cat_class + '\');return false"&gt;' + cat_nex + '&lt;/a&gt;';
-}
-
-dw += '&lt;span class="right"&gt;' + cat_start + ' &amp;ndash; ' + Math.min(cat_start + cat_numb - 1, tt) + ' / ' + tt + '&lt;/span&gt;';
-dw += '&lt;/div&gt;';
-    document.getElementById('show-post').innerHTML = dw + '&lt;style type="text/css"&gt;.cat-' + cat_class + ' a{background:linear-gradient(to right,#cee9ca,#d0eeca)!important;color:#ff7062!important}&lt;\/style&gt;'
-}
-
-
+  
 function show_cat(a) {
     var cat = a.feed.category;
-    var cat_remove = ['']; 
-    var selected_label = "Bài hay"; 
-    var selected_label_index = -1;
+    var cat_label = "Bài hay"; 
+    var cat_index = cat.findIndex(item => item.term === cat_label);
+    if(cat_index === -1) {
+        console.log("Label không tồn tại.");
+        return;
+    }
+    show_post(cat_label, '1', cat_index.toString(), oldestFirst);
     var dw = '';
-    dw += '&lt;ul&gt;';
-    for (var i = 0; i &lt; cat.length; i++) {
-        if (!cat_remove.includes(cat[i].term)) { 
-            dw += '&lt;li class="cat-' + i + '"&gt;';
-            dw += '&lt;a href="" onclick="show_post(\'' + cat[i].term + '\',\'1\',\'' + i + '\');return false"&gt;';
-            dw += cat[i].term;
-            dw += '&lt;/a&gt;';
-            dw += '&lt;/li&gt;';
-        }
-        if (cat[i].term === selected_label) {
-            selected_label_index = i; 
-        }
+    dw += '<ul>';
+    for (var i = 0; i < cat.length; i++) {
+        dw += '<li class="cat-' + i + '">';
+        dw += '<a href="" onclick="cat_name=\'' + cat[i].term + '\'; cat_start=\'1\'; cat_class=\'' + i + '\'; updatePosts(); return false;">';
+        dw += cat[i].term;
+        dw += '</a>';
+        dw += '</li>';
     }
-    dw += '&lt;/ul&gt;';
+    dw += '</ul>';
     document.getElementById('show-cat').innerHTML = dw;
-    
-    if (selected_label_index !== -1) {
-        
-        show_post(selected_label, '1', selected_label_index);
-    }
-    else {
-       
-        show_post(cat[0].term, '1', '0');
-    }
 }
-document.write('&lt;script type="text/javascript" src="' + cat_home + '/feeds/posts/default?alt=json-in-script&amp;max-results=0&amp;callback=show_cat"&gt;&lt;\/script&gt;');
+
+document.write('<script type="text/javascript" src="' + cat_home + '/feeds/posts/default?alt=json-in-script&max-results=0&callback=show_cat"><\/script>');
